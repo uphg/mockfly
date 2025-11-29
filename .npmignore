@@ -1,0 +1,8 @@
+tests/
+examples/
+temp/
+*.log
+.DS_Store
+.env
+.env.local
+MOCKFLY_PLAN.md

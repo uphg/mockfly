@@ -1,0 +1,53 @@
+{
+  "port": 3001,
+  "host": "localhost",
+  "baseUrl": "/api",
+  "delay": 0,
+  "cors": true,
+  "mockDir": "./mockfly/data",
+  "routes": [
+    {
+      "name": "获取用户列表",
+      "path": "/users",
+      "method": "GET",
+      "responseFile": "users.json"
+    },
+    {
+      "name": "获取用户详情",
+      "path": "/users/:id",
+      "method": "GET",
+      "response": {
+        "id": "{{params.id}}",
+        "name": "用户{{params.id}}",
+        "email": "user{{params.id}}@example.com",
+        "createdAt": "2024-01-01T00:00:00Z"
+      }
+    },
+    {
+      "name": "创建用户",
+      "path": "/users",
+      "method": "POST",
+      "response": {
+        "id": "{{body.id}}",
+        "name": "{{body.name}}",
+        "email": "{{body.email}}",
+        "success": true
+      }
+    },
+    {
+      "name": "搜索用户",
+      "path": "/users/search",
+      "method": "GET",
+      "response": {
+        "query": "{{query.q}}",
+        "results": [
+          {
+            "id": "1",
+            "name": "张三",
+            "email": "zhangsan@example.com"
+          }
+        ]
+      }
+    }
+  ]
+}
