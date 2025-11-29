@@ -13,7 +13,7 @@
 | 配置驱动 Mock API | JSON 配置文件 | 核心功能，用户友好 |
 | 热重载机制 | chokidar 文件监听 | 开发体验关键 |
 | 模板变量支持 | Handlebars 引擎 | 动态响应必需 |
-| 多种响应类型 | JSON/文件流/CSV/SQLite | 满足不同场景 |
+| 多种响应类型 | JSON/文件流 | 满足不同场景 |
 | CORS 支持 | cors 中间件 | 跨域访问必需 |
 | 响应延迟模拟 | setTimeout 中间件 | 网络模拟 |
 | 路由默认配置 | routeDefaults 系统 | 减少配置重复 |
@@ -135,8 +135,6 @@ mockfly-next/
   "kept": [
     "commander",
     "handlebars", 
-    "better-sqlite3",
-    "csv",
     "chokidar",
     "lodash.merge",
     "lodash.omit",
