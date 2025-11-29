@@ -1,6 +1,6 @@
 {
   "name": "mockfly",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "description": "轻量级 Mock API 服务 CLI 工具",
   "type": "module",
   "main": "src/server.js",
