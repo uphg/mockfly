@@ -3,7 +3,7 @@ import merge from 'lodash.merge'
 import { fileExists, readJsonFile } from './utils.js'
 
 const defaultConfig = {
-  port: 3001,
+  port: 4000,
   host: 'localhost',
   baseUrl: '/api',
   delay: 0,
