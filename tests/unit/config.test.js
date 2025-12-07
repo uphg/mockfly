@@ -6,8 +6,8 @@ import path from 'path'
 
 test('loadConfig - 加载默认配置', async () => {
   const config = await loadConfig('non-existent-config.json')
-  
-  assert.strictEqual(config.port, 3001)
+
+  assert.strictEqual(config.port, 4000)
   assert.strictEqual(config.host, 'localhost')
   assert.strictEqual(config.baseUrl, '/api')
   assert.strictEqual(config.cors, true)

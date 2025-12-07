@@ -200,3 +200,318 @@ test('createServer - 文件不存在返回 404', async () => {
   
   await fastify.close()
 })
+
+test('createServer - route.response 返回 string 类型', async () => {
+  const config = {
+    port: 3007,
+    host: 'localhost',
+    baseUrl: '/api',
+    cors: true,
+    mockDir: './data',
+    routes: [
+      {
+        path: '/string',
+        method: 'GET',
+        response: 'Hello World'
+      }
+    ]
+  }
+
+  const fastify = await createServer(config)
+
+  const response = await fastify.inject({
+    method: 'GET',
+    url: '/api/string'
+  })
+
+  assert.strictEqual(response.statusCode, 200)
+  assert.strictEqual(response.body, 'Hello World')
+
+  await fastify.close()
+})
+
+test('createServer - route.response 返回 number 类型', async () => {
+  const config = {
+    port: 3008,
+    host: 'localhost',
+    baseUrl: '/api',
+    cors: true,
+    mockDir: './data',
+    routes: [
+      {
+        path: '/number',
+        method: 'GET',
+        response: 42
+      }
+    ]
+  }
+
+  const fastify = await createServer(config)
+
+  const response = await fastify.inject({
+    method: 'GET',
+    url: '/api/number'
+  })
+
+  assert.strictEqual(response.statusCode, 200)
+  assert.strictEqual(response.body, '42')
+
+  await fastify.close()
+})
+
+test('createServer - route.response 返回 array 类型（无模板）', async () => {
+  const config = {
+    port: 3009,
+    host: 'localhost',
+    baseUrl: '/api',
+    cors: true,
+    mockDir: './data',
+    routes: [
+      {
+        path: '/array',
+        method: 'GET',
+        response: [1, 2, 3, 'test', true]
+      }
+    ]
+  }
+
+  const fastify = await createServer(config)
+
+  const response = await fastify.inject({
+    method: 'GET',
+    url: '/api/array'
+  })
+
+  assert.strictEqual(response.statusCode, 200)
+  const data = JSON.parse(response.body)
+  assert.deepStrictEqual(data, [1, 2, 3, 'test', true])
+
+  await fastify.close()
+})
+
+test('createServer - route.response 返回 object 类型（无模板）', async () => {
+  const config = {
+    port: 3010,
+    host: 'localhost',
+    baseUrl: '/api',
+    cors: true,
+    mockDir: './data',
+    routes: [
+      {
+        path: '/object',
+        method: 'GET',
+        response: {
+          status: 'success',
+          code: 200,
+          data: null
+        }
+      }
+    ]
+  }
+
+  const fastify = await createServer(config)
+
+  const response = await fastify.inject({
+    method: 'GET',
+    url: '/api/object'
+  })
+
+  assert.strictEqual(response.statusCode, 200)
+  const data = JSON.parse(response.body)
+  assert.deepStrictEqual(data, {
+    status: 'success',
+    code: 200,
+    data: null
+  })
+
+  await fastify.close()
+})
+
+test('createServer - route.response 返回 boolean 类型', async () => {
+  const config = {
+    port: 3011,
+    host: 'localhost',
+    baseUrl: '/api',
+    cors: true,
+    mockDir: './data',
+    routes: [
+      {
+        path: '/boolean',
+        method: 'GET',
+        response: true
+      }
+    ]
+  }
+
+  const fastify = await createServer(config)
+
+  const response = await fastify.inject({
+    method: 'GET',
+    url: '/api/boolean'
+  })
+
+  assert.strictEqual(response.statusCode, 200)
+  assert.strictEqual(response.body, 'true')
+
+  await fastify.close()
+})
+
+test('createServer - responseFile 读取最外层数组的 JSON 文件', async () => {
+  const testDataDir = path.join(process.cwd(), 'tests', 'fixtures', 'array-data')
+  await fs.mkdir(testDataDir, { recursive: true })
+
+  const testArrayFile = path.join(testDataDir, 'users-array.json')
+  const usersArray = [
+    { id: 1, name: '张三', age: 25 },
+    { id: 2, name: '李四', age: 30 },
+    { id: 3, name: '王五', age: 28 }
+  ]
+  await fs.writeFile(testArrayFile, JSON.stringify(usersArray))
+
+  const config = {
+    port: 3012,
+    host: 'localhost',
+    baseUrl: '/api',
+    cors: true,
+    mockDir: testDataDir,
+    routes: [
+      {
+        path: '/users-array',
+        method: 'GET',
+        responseFile: 'users-array.json'
+      }
+    ]
+  }
+
+  const fastify = await createServer(config)
+
+  const response = await fastify.inject({
+    method: 'GET',
+    url: '/api/users-array'
+  })
+
+  assert.strictEqual(response.statusCode, 200)
+  const data = JSON.parse(response.body)
+  assert.deepStrictEqual(data, usersArray)
+  assert.strictEqual(Array.isArray(data), true)
+
+  await fastify.close()
+  await fs.rm(testDataDir, { recursive: true })
+})
+
+test('createServer - responseFile 读取字符串数组 JSON 文件', async () => {
+  const testDataDir = path.join(process.cwd(), 'tests', 'fixtures', 'array-data')
+  await fs.mkdir(testDataDir, { recursive: true })
+
+  const testArrayFile = path.join(testDataDir, 'tags.json')
+  const tagsArray = ['javascript', 'nodejs', 'testing', 'api']
+  await fs.writeFile(testArrayFile, JSON.stringify(tagsArray))
+
+  const config = {
+    port: 3013,
+    host: 'localhost',
+    baseUrl: '/api',
+    cors: true,
+    mockDir: testDataDir,
+    routes: [
+      {
+        path: '/tags',
+        method: 'GET',
+        responseFile: 'tags.json'
+      }
+    ]
+  }
+
+  const fastify = await createServer(config)
+
+  const response = await fastify.inject({
+    method: 'GET',
+    url: '/api/tags'
+  })
+
+  assert.strictEqual(response.statusCode, 200)
+  const data = JSON.parse(response.body)
+  assert.deepStrictEqual(data, tagsArray)
+  assert.strictEqual(Array.isArray(data), true)
+
+  await fastify.close()
+  await fs.rm(testDataDir, { recursive: true })
+})
+
+test('createServer - responseFile 读取数字数组 JSON 文件', async () => {
+  const testDataDir = path.join(process.cwd(), 'tests', 'fixtures', 'array-data')
+  await fs.mkdir(testDataDir, { recursive: true })
+
+  const testArrayFile = path.join(testDataDir, 'scores.json')
+  const scoresArray = [95, 87, 92, 78, 100]
+  await fs.writeFile(testArrayFile, JSON.stringify(scoresArray))
+
+  const config = {
+    port: 3014,
+    host: 'localhost',
+    baseUrl: '/api',
+    cors: true,
+    mockDir: testDataDir,
+    routes: [
+      {
+        path: '/scores',
+        method: 'GET',
+        responseFile: 'scores.json'
+      }
+    ]
+  }
+
+  const fastify = await createServer(config)
+
+  const response = await fastify.inject({
+    method: 'GET',
+    url: '/api/scores'
+  })
+
+  assert.strictEqual(response.statusCode, 200)
+  const data = JSON.parse(response.body)
+  assert.deepStrictEqual(data, scoresArray)
+  assert.strictEqual(Array.isArray(data), true)
+
+  await fastify.close()
+  await fs.rm(testDataDir, { recursive: true })
+})
+
+test('createServer - responseFile 读取混合类型数组 JSON 文件', async () => {
+  const testDataDir = path.join(process.cwd(), 'tests', 'fixtures', 'array-data')
+  await fs.mkdir(testDataDir, { recursive: true })
+
+  const testArrayFile = path.join(testDataDir, 'mixed.json')
+  const mixedArray = [1, 'hello', true, null, { name: 'test' }, [1, 2]]
+  await fs.writeFile(testArrayFile, JSON.stringify(mixedArray))
+
+  const config = {
+    port: 3015,
+    host: 'localhost',
+    baseUrl: '/api',
+    cors: true,
+    mockDir: testDataDir,
+    routes: [
+      {
+        path: '/mixed',
+        method: 'GET',
+        responseFile: 'mixed.json'
+      }
+    ]
+  }
+
+  const fastify = await createServer(config)
+
+  const response = await fastify.inject({
+    method: 'GET',
+    url: '/api/mixed'
+  })
+
+  assert.strictEqual(response.statusCode, 200)
+  const data = JSON.parse(response.body)
+  assert.deepStrictEqual(data, mixedArray)
+  assert.strictEqual(Array.isArray(data), true)
+
+  await fastify.close()
+  await fs.rm(testDataDir, { recursive: true })
+})

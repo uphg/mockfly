@@ -58,3 +58,43 @@ test('getContentType - HTML 文件', () => {
 test('getContentType - 未知类型', () => {
   assert.strictEqual(getContentType('file.unknown'), 'application/octet-stream')
 })
+
+test('readJsonFile - 最外层是数组的 JSON 文件', async () => {
+  const testFile = path.join(process.cwd(), 'test-array.json')
+  const testArray = [
+    { id: 1, name: '用户1' },
+    { id: 2, name: '用户2' },
+    { id: 3, name: '用户3' }
+  ]
+  await fs.writeFile(testFile, JSON.stringify(testArray))
+
+  const result = await readJsonFile(testFile)
+  assert.deepStrictEqual(result, testArray)
+  assert.strictEqual(Array.isArray(result), true)
+
+  await fs.unlink(testFile)
+})
+
+test('readJsonFile - 简单字符串数组', async () => {
+  const testFile = path.join(process.cwd(), 'test-string-array.json')
+  const testArray = ['apple', 'banana', 'cherry']
+  await fs.writeFile(testFile, JSON.stringify(testArray))
+
+  const result = await readJsonFile(testFile)
+  assert.deepStrictEqual(result, testArray)
+  assert.strictEqual(Array.isArray(result), true)
+
+  await fs.unlink(testFile)
+})
+
+test('readJsonFile - 数字数组', async () => {
+  const testFile = path.join(process.cwd(), 'test-number-array.json')
+  const testArray = [1, 2, 3, 4, 5]
+  await fs.writeFile(testFile, JSON.stringify(testArray))
+
+  const result = await readJsonFile(testFile)
+  assert.deepStrictEqual(result, testArray)
+  assert.strictEqual(Array.isArray(result), true)
+
+  await fs.unlink(testFile)
+})
