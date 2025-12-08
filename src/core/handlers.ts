@@ -1,10 +1,11 @@
 import { promises as fs } from 'fs'
 import path from 'path'
-import { fileExists, readJsonFile, resolveFilePath, getContentType, delay } from './utils.js'
-import { createTemplateContext, renderTemplate } from './templates.js'
+import { fileExists, readJsonFile, resolveFilePath, getContentType, delay } from './utils.ts'
+import { createTemplateContext, renderTemplate } from './templates.ts'
+import type { Route, MockflyConfig } from '../types/config.js'
 
-export const createRouteHandler = (route, config) => {
-  return async (request, reply) => {
+export const createRouteHandler = (route: Route, config: MockflyConfig) => {
+  return async (request: any, reply: any) => {
     if (route.delay || config.delay) {
       await delay(route.delay || config.delay)
     }
@@ -24,7 +25,7 @@ export const createRouteHandler = (route, config) => {
   }
 }
 
-const handleFileResponse = async (responseFile, config, reply) => {
+const handleFileResponse = async (responseFile: string, config: MockflyConfig, reply: any) => {
   const filePath = resolveFilePath(config.mockDir, responseFile)
 
   if (!await fileExists(filePath)) {
@@ -44,7 +45,7 @@ const handleFileResponse = async (responseFile, config, reply) => {
 }
 
 export const createHealthHandler = () => {
-  return async (request, reply) => {
+  return async (_request: any, reply: any) => {
     return reply.send({ 
       status: 'ok',
       timestamp: new Date().toISOString()

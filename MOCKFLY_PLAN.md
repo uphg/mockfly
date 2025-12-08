@@ -2,7 +2,7 @@
 
 ### 🎯 项目概述
 
-基于现有 `./temp/mock-server` 项目，创建轻量、高性能的 MockFly Mock API 服务 CLI 工具，专注于为前端开发提供简洁易用的本地 Mock 服务。
+创建轻量、高性能的 MockFly Mock API 服务 CLI 工具，专注于为前端开发提供简洁易用的本地 Mock 服务。
 
 ### 📊 现有项目分析
 
@@ -19,55 +19,6 @@
 | 路由默认配置 | routeDefaults 系统 | 减少配置重复 |
 | 健康检查端点 | `/health` 路由 | 服务监控 |
 | 测试套件 | node:test + supertest | 质量保证 |
-
-#### ❌ 移除的功能模块
-
-| 功能模块 | 现有文件 | 移除原因 |
-|---------|---------|----------|
-| 文档生成 | `docs-generator.js` | 简化项目复杂度 |
-| VitePress 集成 | `src/cli/docs.js` | 非核心功能 |
-| Markdown 处理 | `mdast-*` 依赖 | 减少依赖体积 |
-| CLI init 命令 | `src/cli/init.js` | 简化使用流程 |
-| CLI docs 命令 | `bin/cli.js` docs 相关 | 聚焦核心功能 |
-
-### 🏗️ 技术架构重构
-
-#### 框架迁移：Express.js → Fastify
-
-**优势对比：**
-- **性能提升**：Fastify 比 Express 快 2-3 倍
-- **TypeScript 支持**：更好的类型推导
-- **Hook 系统**：更优雅的中间件处理
-- **Schema 验证**：内置 JSON Schema 支持
-
-**迁移映射：**
-```javascript
-// Express.js
-app.use(cors())
-app.get('/health', (req, res) => res.json({ status: 'ok' }))
-
-// Fastify
-fastify.register(import('@fastify/cors'))
-fastify.get('/health', () => ({ status: 'ok' }))
-```
-
-#### 函数式编程重构
-
-**现有面向对象代码：**
-```javascript
-class MockServer {
-  constructor() { this.app = express() }
-  async start() { /* 复杂逻辑 */ }
-}
-```
-
-**重构为函数式：**
-```javascript
-const createServer = (config) => {
-  const fastify = fastifyInstance(config)
-  return { server: fastify, start: () => startServer(fastify, config) }
-}
-```
 
 ### 📁 新项目结构设计
 

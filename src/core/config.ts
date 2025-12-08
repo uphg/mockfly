@@ -1,8 +1,9 @@
 import path from 'path'
 import merge from 'lodash.merge'
-import { fileExists, readJsonFile } from './utils.js'
+import { fileExists, readJsonFile } from './utils.ts'
+import type { MockflyConfig, CliOptions, Route } from '../types/config.js'
 
-const defaultConfig = {
+const defaultConfig: MockflyConfig = {
   port: 4000,
   host: 'localhost',
   baseUrl: '/api',
@@ -12,18 +13,21 @@ const defaultConfig = {
   routes: []
 }
 
-export const loadConfig = async (configPath = 'mockfly/mock.config.json', cliOptions = {}) => {
+export const loadConfig = async (
+  configPath = 'mockfly/mock.config.json',
+  cliOptions: CliOptions = {}
+): Promise<MockflyConfig> => {
   const cwd = process.cwd()
   const resolvedPath = path.resolve(cwd, configPath)
   
-  let fileConfig = {}
+  let fileConfig: Partial<MockflyConfig> = {}
   if (await fileExists(resolvedPath)) {
     fileConfig = await readJsonFile(resolvedPath)
   } else {
     console.warn(`Config file not found: ${resolvedPath}, using default config`)
   }
 
-  const config = merge({}, defaultConfig, fileConfig, cliOptions)
+  const config = merge({}, defaultConfig, fileConfig, cliOptions) as MockflyConfig
   
   config.mockDir = path.resolve(cwd, config.mockDir)
   config.configPath = resolvedPath
@@ -34,7 +38,7 @@ export const loadConfig = async (configPath = 'mockfly/mock.config.json', cliOpt
   return config
 }
 
-const validateConfig = (config) => {
+const validateConfig = (config: MockflyConfig): void => {
   if (!config.port || typeof config.port !== 'number') {
     throw new Error('Invalid port number')
   }
@@ -47,7 +51,7 @@ const validateConfig = (config) => {
     throw new Error('Routes must be an array')
   }
   
-  config.routes.forEach((route, index) => {
+  config.routes.forEach((route: Route, index: number) => {
     if (!route.path) {
       throw new Error(`Route at index ${index} missing required 'path' property`)
     }
@@ -60,6 +64,9 @@ const validateConfig = (config) => {
   })
 }
 
-export const reloadConfig = async (configPath, cliOptions = {}) => {
+export const reloadConfig = async (
+  configPath: string,
+  cliOptions: CliOptions = {}
+): Promise<MockflyConfig> => {
   return await loadConfig(configPath, cliOptions)
 }

@@ -1,25 +1,27 @@
 import chokidar from 'chokidar'
 import path from 'path'
-import { loadConfig } from '../config.js'
-import { startServer } from '../server.js'
+import { loadConfig } from '../../core/config.js'
+import { startServer } from '../../core/server.js'
+import type { FastifyInstance } from 'fastify'
+import type { CliOptions } from '../../types/config.js'
 
-let currentServer = null
+let currentServer: FastifyInstance | null = null
 let isRestarting = false
 
-export const devCommand = async (options) => {
+export const devCommand = async (options: CliOptions) => {
   try {
-    const cliOptions = {}
+    const cliOptions: Partial<CliOptions> = {}
     if (options.port) {
-      cliOptions.port = parseInt(options.port)
+      cliOptions.port = parseInt(options.port.toString())
     }
     
-    const config = await loadConfig(options.config, cliOptions)
+    const config = await loadConfig(options.config || 'mockfly/mock.config.json', cliOptions)
     currentServer = await startServer(config)
     
     console.log('\n🔥 Hot reload enabled - watching for changes...\n')
     
     const watchPaths = [
-      config.configPath,
+      config.configPath!,
       config.mockDir
     ]
     
@@ -29,14 +31,16 @@ export const devCommand = async (options) => {
       ignoreInitial: true
     })
     
-    let debounceTimer = null
+    let debounceTimer: NodeJS.Timeout | null = null
     
     watcher.on('all', (event, filepath) => {
       if (isRestarting) return
       
       console.log(`\n📝 File ${event}: ${path.relative(process.cwd(), filepath)}`)
       
-      clearTimeout(debounceTimer)
+      if (debounceTimer) {
+        clearTimeout(debounceTimer)
+      }
       debounceTimer = setTimeout(async () => {
         await restartServer(options)
       }, 500)
@@ -52,12 +56,12 @@ export const devCommand = async (options) => {
     })
     
   } catch (error) {
-    console.error('Failed to start dev server:', error.message)
+    console.error('Failed to start dev server:', error instanceof Error ? error.message : 'Unknown error')
     process.exit(1)
   }
 }
 
-const restartServer = async (options) => {
+const restartServer = async (options: CliOptions) => {
   if (isRestarting) return
   isRestarting = true
   
@@ -68,17 +72,17 @@ const restartServer = async (options) => {
       await currentServer.close()
     }
     
-    const cliOptions = {}
+    const cliOptions: Partial<CliOptions> = {}
     if (options.port) {
-      cliOptions.port = parseInt(options.port)
+      cliOptions.port = parseInt(options.port.toString())
     }
     
-    const config = await loadConfig(options.config, cliOptions)
+    const config = await loadConfig(options.config || 'mockfly/mock.config.json', cliOptions)
     currentServer = await startServer(config)
     
     console.log('✅ Server restarted successfully\n')
   } catch (error) {
-    console.error('❌ Failed to restart server:', error.message)
+    console.error('❌ Failed to restart server:', error instanceof Error ? error.message : 'Unknown error')
   } finally {
     isRestarting = false
   }

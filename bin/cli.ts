@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { program } from 'commander'
-import { startCommand, devCommand } from '../dist/cli.mjs'
+import { startCommand } from '../dist/cli.mjs'
+import { devCommand } from '../dist/cli.mjs'
 
 program
   .name('mockfly')
