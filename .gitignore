@@ -11,3 +11,5 @@ coverage/
 *.sqlite3
 
 temp
+
+opencodetmp
