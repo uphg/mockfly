@@ -1,6 +1,6 @@
 import { createRouteHandler, createHealthHandler } from './handlers.ts'
 import type { FastifyInstance } from 'fastify'
-import type { MockflyConfig } from '../types/config.js'
+import type { MockflyConfig } from '../utility-types'
 
 export const registerRoutes = async (fastify: FastifyInstance, config: MockflyConfig): Promise<void> => {
   fastify.get('/health', createHealthHandler())

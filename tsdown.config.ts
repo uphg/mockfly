@@ -8,19 +8,10 @@ export default defineConfig({
   outDir: 'dist',
   format: ['esm'],
   dts: true,
-  sourcemap: true,
+  // sourcemap: true,
   clean: true,
   exports: true,
   platform: 'node',
   minify: false,
-  external: [
-    'fastify',
-    '@fastify/cors',
-    '@fastify/static',
-    'commander',
-    'handlebars',
-    'chokidar',
-    'lodash.merge',
-    'path-to-regexp'
-  ]
+  external: ['fastify', '@fastify/cors', '@fastify/static', 'commander', 'handlebars', 'chokidar', 'lodash.merge', 'path-to-regexp']
 })

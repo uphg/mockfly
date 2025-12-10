@@ -1,5 +1,5 @@
 import Handlebars from 'handlebars'
-import type { TemplateContext, ResponseData } from '../types/config.js'
+import type { TemplateContext, ResponseData } from '../utility-types'
 
 export const createTemplateContext = (request: any): TemplateContext => {
   return {

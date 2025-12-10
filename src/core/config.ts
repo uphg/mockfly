@@ -1,7 +1,7 @@
 import path from 'path'
 import merge from 'lodash.merge'
 import { fileExists, readJsonFile } from './utils.ts'
-import type { MockflyConfig, CliOptions, Route } from '../types/config.js'
+import type { MockflyConfig, CliOptions, Route } from '../utility-types'
 
 const defaultConfig: MockflyConfig = {
   port: 4000,
@@ -13,8 +13,10 @@ const defaultConfig: MockflyConfig = {
   routes: []
 }
 
+export const defaultConfigPath = 'mockfly/mock.config.json'
+
 export const loadConfig = async (
-  configPath = 'mockfly/mock.config.json',
+  configPath = defaultConfigPath,
   cliOptions: CliOptions = {}
 ): Promise<MockflyConfig> => {
   const cwd = process.cwd()

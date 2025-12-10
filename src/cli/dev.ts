@@ -1,9 +1,9 @@
 import chokidar from 'chokidar'
 import path from 'path'
-import { loadConfig } from '../../core/config.js'
-import { startServer } from '../../core/server.js'
+import { defaultConfigPath, loadConfig } from '../core/config'
+import { startServer } from '../core/server'
 import type { FastifyInstance } from 'fastify'
-import type { CliOptions } from '../../types/config.js'
+import type { CliOptions } from '../utility-types'
 
 let currentServer: FastifyInstance | null = null
 let isRestarting = false
@@ -15,7 +15,7 @@ export const devCommand = async (options: CliOptions) => {
       cliOptions.port = parseInt(options.port.toString())
     }
     
-    const config = await loadConfig(options.config || 'mockfly/mock.config.json', cliOptions)
+    const config = await loadConfig(options.config || defaultConfigPath, cliOptions)
     currentServer = await startServer(config)
     
     console.log('\n🔥 Hot reload enabled - watching for changes...\n')
@@ -77,7 +77,7 @@ const restartServer = async (options: CliOptions) => {
       cliOptions.port = parseInt(options.port.toString())
     }
     
-    const config = await loadConfig(options.config || 'mockfly/mock.config.json', cliOptions)
+    const config = await loadConfig(options.config || defaultConfigPath, cliOptions)
     currentServer = await startServer(config)
     
     console.log('✅ Server restarted successfully\n')

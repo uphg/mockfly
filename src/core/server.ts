@@ -2,7 +2,7 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import fastifyStatic from '@fastify/static'
 import { registerRoutes } from './routes.ts'
-import type { MockflyConfig } from '../types/config.js'
+import type { MockflyConfig } from '../utility-types'
 
 export const createServer = async (config: MockflyConfig) => {
   const fastify = Fastify({

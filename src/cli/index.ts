@@ -1,2 +1,2 @@
-export { devCommand } from './commands/dev.js'
-export { startCommand } from './commands/start.js'
+export { devCommand } from './dev'
+export { startCommand } from './start'

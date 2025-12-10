@@ -2,7 +2,7 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import { fileExists, readJsonFile, resolveFilePath, getContentType, delay } from './utils.ts'
 import { createTemplateContext, renderTemplate } from './templates.ts'
-import type { Route, MockflyConfig } from '../types/config.js'
+import type { Route, MockflyConfig } from '../utility-types'
 
 export const createRouteHandler = (route: Route, config: MockflyConfig) => {
   return async (request: any, reply: any) => {

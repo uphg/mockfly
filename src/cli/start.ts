@@ -1,6 +1,6 @@
-import { loadConfig } from '../../core/config.js'
-import { startServer } from '../../core/server.js'
-import type { CliOptions } from '../../types/config.js'
+import { defaultConfigPath, loadConfig } from '../core/config'
+import { startServer } from '../core/server'
+import type { CliOptions } from '../utility-types'
 
 export const startCommand = async (options: CliOptions) => {
   try {
@@ -9,7 +9,7 @@ export const startCommand = async (options: CliOptions) => {
       cliOptions.port = parseInt(options.port.toString())
     }
     
-    const config = await loadConfig(options.config || 'mockfly/mock.config.json', cliOptions)
+    const config = await loadConfig(options.config || defaultConfigPath, cliOptions)
     await startServer(config)
   } catch (error) {
     console.error('Failed to start server:', error instanceof Error ? error.message : 'Unknown error')
