@@ -20,7 +20,13 @@
     "dev:ts": "tsx src/cli/index.ts dev",
     "prepublishOnly": "pnpm run build"
   },
-  "keywords": ["mock", "api", "server", "cli", "development"],
+  "keywords": [
+    "mock",
+    "api",
+    "server",
+    "cli",
+    "development"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
