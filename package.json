@@ -1,6 +1,6 @@
 {
   "name": "mockfly",
-  "version": "1.0.0-alpha.8",
+  "version": "1.2.0-alpha.1",
   "description": "轻量级 Mock API 服务 CLI 工具",
   "type": "module",
   "main": "./dist/index.mjs",
@@ -18,7 +18,8 @@
     "start:ts": "tsx src/cli/index.ts",
     "dev:js": "node bin/cli.js dev",
     "dev:ts": "tsx src/cli/index.ts dev",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "release": "node scripts/release.js"
   },
   "keywords": [
     "mock",
@@ -42,6 +43,9 @@
   "devDependencies": {
     "@types/lodash.merge": "^4.6.9",
     "@types/node": "^24.10.1",
+    "enquirer": "^2.4.1",
+    "picocolors": "^1.1.1",
+    "semver": "^7.7.3",
     "supertest": "^6.3.3",
     "tsdown": "^0.17.1",
     "tsx": "^4.21.0",
