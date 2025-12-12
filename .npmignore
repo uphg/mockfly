@@ -1,6 +1,7 @@
 tests/
 examples/
 temp/
+demo-config/
 *.log
 .DS_Store
 .env

@@ -1,0 +1,23 @@
+{
+  "port": 4000,
+  "host": "localhost",
+  "baseUrl": "/api",
+  "delay": 0,
+  "cors": true,
+  "mockDir": "./mockfly/data",
+  "routes": [
+    {
+      "name": "示例 API",
+      "path": "/example",
+      "method": "GET",
+      "response": {
+        "message": "Hello from Mockfly!",
+        "timestamp": "2024-12-12T10:00:00.000Z",
+        "data": {
+          "id": 1,
+          "name": "示例数据"
+        }
+      }
+    }
+  ]
+}
