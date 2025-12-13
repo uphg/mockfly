@@ -1,21 +1,26 @@
 import { delay } from './utils.ts'
-import { createTemplateContext, renderTemplate } from './templates.ts'
-import type { Route, MockflyConfig, ResponseData } from '../utility-types'
+import type { Route, MockflyConfig, TemplateContext } from '../utility-types'
+import type { FastifyRequest, FastifyReply } from 'fastify'
 
 export const createRouteHandler = (route: Route, config: MockflyConfig) => {
-  return async (request: any, reply: any) => {
+  return async (request: FastifyRequest, reply: FastifyReply) => {
     if (route.delay || config.delay) {
       await delay(route.delay || config.delay)
     }
 
-    const context = createTemplateContext(request)
+    const context: TemplateContext = {
+      params: request.params as Record<string, string>,
+      query: request.query as Record<string, string | string[]>,
+      body: request.body,
+      headers: request.headers as Record<string, string>
+    }
 
     if (route.response) {
       if (typeof route.response === 'function') {
-        return await route.response(context)
+        const result = await route.response(context)
+        return reply.send(result)
       }
-      const result = renderTemplate(route.response as ResponseData, context)
-      return reply.send(result)
+      return reply.send(route.response)
     }
     
     return reply.code(500).send({ error: 'No response configured' })
@@ -23,7 +28,7 @@ export const createRouteHandler = (route: Route, config: MockflyConfig) => {
 }
 
 export const createHealthHandler = () => {
-  return async (_request: any, reply: any) => {
+  return async (_request: FastifyRequest, reply: FastifyReply) => {
     return reply.send({ 
       status: 'ok',
       timestamp: new Date().toISOString()

@@ -2,6 +2,7 @@ import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import fastifyStatic from '@fastify/static'
 import { registerRoutes } from './routes.ts'
+import { createError, ErrorCodes, logInfo } from './errors.ts'
 import type { MockflyConfig } from '../utility-types'
 
 export const createServer = async (config: MockflyConfig) => {
@@ -36,12 +37,21 @@ export const startServer = async (config: MockflyConfig) => {
       port: config.port, 
       host: config.host 
     })
-    console.log(`MockFly server running at http://${config.host}:${config.port}`)
-    console.log(`Base URL: ${config.baseUrl}`)
-    console.log(`Health check: http://${config.host}:${config.port}/health`)
+    logInfo(`MockFly server running at http://${config.host}:${config.port}`)
+    logInfo(`Base URL: ${config.baseUrl}`)
+    logInfo(`Health check: http://${config.host}:${config.port}/health`)
+    console.log('')
+    config.routes.forEach((route) => {
+      const fullPath = config.baseUrl + route.path
+      const routeName = route.name || route.path
+      return console.log(`Registered route: [${route.method}] ${fullPath} - ${routeName}`)
+    })
     return fastify
   } catch (err) {
-    fastify.log.error(err)
-    process.exit(1)
+    throw createError(
+      ErrorCodes.SERVER_START_FAILED,
+      `Failed to start server on ${config.host}:${config.port}`,
+      { host: config.host, port: config.port, error: err instanceof Error ? err.message : 'Unknown error' }
+    )
   }
 }

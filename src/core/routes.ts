@@ -8,7 +8,6 @@ export const registerRoutes = async (fastify: FastifyInstance, config: MockflyCo
   for (const route of config.routes) {
     const fullPath = config.baseUrl + route.path
     const handler = createRouteHandler(route, config)
-    const routeName = route.name || route.path
     
     switch (route.method.toLowerCase()) {
       case 'get':
@@ -35,8 +34,6 @@ export const registerRoutes = async (fastify: FastifyInstance, config: MockflyCo
       default:
         console.warn(`Unknown HTTP method: ${route.method}`)
     }
-    
-    console.log(`Registered route: [${route.method}] ${fullPath} - ${routeName}`)
   }
 }
 

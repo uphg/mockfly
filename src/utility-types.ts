@@ -21,31 +21,22 @@ export interface Route {
   delay?: number
 }
 
-interface AsyncFunResponse {
-  async (req: TemplateContext): ResponseData
-}
-
-interface FunResponse {
-  (req: TemplateContext): ResponseData
-}
+type AsyncFunResponse = (req: TemplateContext) => Promise<ResponseData>
+type FunResponse = (req: TemplateContext) => ResponseData
 
 export type ResponseData = string | number | boolean | null | ResponseObject | ResponseArray
 
 export interface ResponseObject {
-  [key: string]: ResponseData | ResponseTemplate
+  [key: string]: ResponseData
 }
 
-export interface ResponseArray extends Array<ResponseData | ResponseTemplate> {}
-
-export interface ResponseTemplate {
-  [templateKey: string]: string | ResponseTemplate | ResponseTemplate[]
-}
+export interface ResponseArray extends Array<ResponseData> {}
 
 export interface TemplateContext {
-  params: Record<string, any>
-  query: Record<string, any>
-  body: any
-  headers: Record<string, any>
+  params: Record<string, string>
+  query: Record<string, string | string[]>
+  body: unknown
+  headers: Record<string, string>
 }
 
 export interface CliOptions {

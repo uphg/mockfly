@@ -20,14 +20,14 @@ program
 program
   .command('start')
   .description('启动 Mock 服务器（生产模式）')
-  .option('-c, --config <path>', '配置文件路径', 'mockfly/mock.config.json')
+  .option('-c, --config <path>', '配置文件路径')
   .option('-p, --port <number>', '端口号')
   .action(startCommand)
 
 program
   .command('dev')
   .description('启动 Mock 服务器（开发模式，支持热重载）')
-  .option('-c, --config <path>', '配置文件路径', 'mockfly/mock.config.json')
+  .option('-c, --config <path>', '配置文件路径')
   .option('-p, --port <number>', '端口号')
   .action(devCommand)
 

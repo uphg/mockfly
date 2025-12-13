@@ -1,6 +1,6 @@
 {
   "name": "mockfly",
-  "version": "1.2.2",
+  "version": "1.2.7",
   "description": "轻量级 Mock API 服务 CLI 工具",
   "type": "module",
   "main": "./dist/index.mjs",
@@ -14,6 +14,9 @@
     "test": "vitest",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
+    "test:coverage": "vitest run --coverage",
+    "test:coverage:unit": "vitest run tests/unit --coverage",
+    "test:coverage:integration": "vitest run tests/integration --coverage",
     "start": "node bin/cli.js start",
     "start:ts": "tsx src/cli/index.ts",
     "dev:js": "node bin/cli.js dev",
@@ -36,13 +39,13 @@
     "chokidar": "^3.5.3",
     "commander": "^11.1.0",
     "fastify": "^4.24.3",
-    "handlebars": "^4.7.8",
     "lodash.merge": "^4.6.2",
     "path-to-regexp": "^6.2.1"
   },
   "devDependencies": {
     "@types/lodash.merge": "^4.6.9",
     "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "^4.0.15",
     "enquirer": "^2.4.1",
     "picocolors": "^1.1.1",
     "semver": "^7.7.3",

@@ -1,6 +1,7 @@
 import path from 'path'
 import merge from 'lodash.merge'
 import { fileExists } from './utils.ts'
+import { createError, ErrorCodes, logWarning } from './errors.ts'
 import type { MockflyConfig, CliOptions, Route } from '../utility-types'
 
 const defaultConfig: MockflyConfig = {
@@ -18,26 +19,27 @@ const configFileExtensions = ['.ts', '.js'] as const
 
 // 按优先级搜索配置文件
 const findConfigFile = async (basePath?: string): Promise<string | null> => {
-  if (!basePath) return null
   const cwd = process.cwd()
   const mockDir = path.join(cwd, 'mockfly');
-  const baseName = path.basename(basePath, path.extname(basePath))
-  
-  // 如果指定了具体路径，优先使用该路径
-  if (path.isAbsolute(basePath) || basePath.includes(path.sep)) {
-    const resolvedPath = path.resolve(cwd, basePath)
-    if (await fileExists(resolvedPath)) {
-      return resolvedPath
-    }
-    return null
-  }
+  const baseName = basePath ? path.basename(basePath, path.extname(basePath)) : 'mock.config'
 
-  // 按优先级搜索默认配置文件名
-  for (const ext of configFileExtensions) {
-    const configPath = path.resolve(mockDir, `${baseName}${ext}`)
-    if (await fileExists(configPath)) {
-      return configPath
+  if (basePath) {
+    // 如果指定了具体路径，优先使用该路径
+    if (path.isAbsolute(basePath) || basePath.includes(path.sep)) {
+      const resolvedPath = path.resolve(cwd, basePath)
+      if (await fileExists(resolvedPath)) {
+        return resolvedPath
+      }
+      return null
     }
+  } else {
+      // 按优先级搜索默认配置文件名
+      for (const ext of configFileExtensions) {
+        const configPath = path.resolve(mockDir, `${baseName}${ext}`)
+        if (await fileExists(configPath)) {
+          return configPath
+        }
+      }
   }
 
   return null
@@ -55,16 +57,26 @@ const loadJsConfig = async (filePath: string): Promise<Partial<MockflyConfig>> =
       if (typeof result === 'object' && result !== null) {
         return result as Partial<MockflyConfig>
       }
-      throw new Error('Config function must return an object')
+      throw createError(
+        ErrorCodes.CONFIG_FUNCTION_INVALID_RETURN,
+        'Config function must return an object'
+      )
     } else if (typeof config === 'object' && config !== null) {
       // 静态对象配置
       return config as Partial<MockflyConfig>
     } else {
-      throw new Error('Config file must export a default object or function')
+      throw createError(
+        ErrorCodes.CONFIG_INVALID_EXPORT,
+        'Config file must export a default object or function'
+      )
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
-    throw new Error(`Failed to load JS/TS config file ${filePath}: ${message}`)
+    throw createError(
+      ErrorCodes.CONFIG_LOAD_FAILED,
+      `Failed to load JS/TS config file ${filePath}: ${message}`,
+      { filePath, originalError: message }
+    )
   }
 }
 
@@ -84,16 +96,20 @@ export const loadConfig = async (
       // JS/TS 配置文件
       fileConfig = await loadJsConfig(resolvedPath)
     } else {
-      throw new Error(`Unsupported config file extension: ${ext}`)
+      throw createError(
+        ErrorCodes.CONFIG_UNSUPPORTED_EXT,
+        `Unsupported config file extension: ${ext}`,
+        { filePath: resolvedPath, extension: ext }
+      )
     }
   } else {
-    console.warn(`Config file not found: ${configPath}, using default config`)
+    logWarning(`Config file not found: ${configPath}, using default config`)
   }
 
   const config = merge({}, defaultConfig, fileConfig, cliOptions) as MockflyConfig
   
-  config.mockDir = path.resolve(cwd, config.mockDir)
-  config.configPath = resolvedPath || path.resolve(cwd, configPath)
+  config.mockDir = path.resolve(cwd, config.mockDir || './mockfly/data')
+  config.configPath = resolvedPath || (configPath ? path.resolve(cwd, configPath) : path.resolve(cwd, 'mockfly/mock.config.ts'))
   config.configDir = path.dirname(config.configPath)
   
   validateConfig(config)
@@ -103,26 +119,46 @@ export const loadConfig = async (
 
 const validateConfig = (config: MockflyConfig): void => {
   if (!config.port || typeof config.port !== 'number') {
-    throw new Error('Invalid port number')
+    throw createError(
+      ErrorCodes.CONFIG_INVALID_PORT,
+      'Invalid port number',
+      { port: config.port }
+    )
   }
   
   if (!config.host || typeof config.host !== 'string') {
-    throw new Error('Invalid host')
+    throw createError(
+      ErrorCodes.CONFIG_INVALID_HOST,
+      'Invalid host',
+      { host: config.host }
+    )
   }
   
   if (!Array.isArray(config.routes)) {
-    throw new Error('Routes must be an array')
+    throw createError(
+      ErrorCodes.CONFIG_INVALID_ROUTES,
+      'Routes must be an array',
+      { routes: config.routes }
+    )
   }
   
   config.routes.forEach((route: Route, index: number) => {
     if (!route.path) {
-      throw new Error(`Route at index ${index} missing required 'path' property`)
+      throw createError(
+        ErrorCodes.CONFIG_MISSING_PATH,
+        `Route at index ${index} missing required 'path' property`,
+        { index, route }
+      )
     }
     if (!route.method) {
       route.method = 'GET'
     }
     if (!route.response) {
-      throw new Error(`Route '${route.path}' must have either 'response' property`)
+      throw createError(
+        ErrorCodes.CONFIG_MISSING_RESPONSE,
+        `Route '${route.path}' must have either 'response' property`,
+        { path: route.path, route }
+      )
     }
   })
 }

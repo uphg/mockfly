@@ -1,1 +1,0 @@
-export default {"port":7777,"host":"ts-host","routes":[{"path":"/ts","method":"GET","response":{"from":"ts"}}]}

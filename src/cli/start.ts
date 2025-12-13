@@ -1,18 +1,15 @@
 import { loadConfig } from '../core/config'
 import { startServer } from '../core/server'
+import { handleError } from '../core/errors'
+import { createCliOptions } from './utils'
 import type { CliOptions } from '../utility-types'
 
 export const startCommand = async (options: CliOptions) => {
   try {
-    const cliOptions: Partial<CliOptions> = {}
-    if (options.port) {
-      cliOptions.port = parseInt(options.port.toString())
-    }
-    
+    const cliOptions = createCliOptions(options)
     const config = await loadConfig(options.config, cliOptions)
     await startServer(config)
   } catch (error) {
-    console.error('Failed to start server:', error instanceof Error ? error.message : 'Unknown error')
-    process.exit(1)
+    handleError(error)
   }
 }

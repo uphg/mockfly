@@ -2,6 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 // import { fileURLToPath } from 'url'
 import { fileExists } from '../core/utils'
+import { createError, ErrorCodes, handleError } from '../core/errors'
 
 // 获取当前文件的目录路径（ES 模块兼容）
 // const __filename = fileURLToPath(import.meta.url)
@@ -41,9 +42,7 @@ export const initCommand = async (options: InitOptions = {}) => {
     console.log('4. 运行 "mockfly start" 启动生产服务器')
 
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    console.error('❌ 初始化失败:', message)
-    process.exit(1)
+    handleError(error)
   }
 }
 
@@ -90,7 +89,7 @@ const createDirectoryStructure = async (cwd: string) => {
 
 // 从模板复制文件
 const copyFromTemplate = async (cwd: string, ext: string) => {
-  const templateType = ext.slice(1) // 移除点号，得到 'js', 'ts', 'json'
+  const templateType = ext.slice(1) // 移除点号，得到 'js', 'ts'
   const templatePath = path.join('/home/uphg/projects/mockfly-next/templates', templateType)
   const targetPath = path.join(cwd, 'mockfly')
   
@@ -98,7 +97,11 @@ const copyFromTemplate = async (cwd: string, ext: string) => {
     // 检查模板目录是否存在
     await fs.access(templatePath)
   } catch (error) {
-    throw new Error(`Template not found for type: ${templateType}`)
+    throw createError(
+      ErrorCodes.INIT_TEMPLATE_NOT_FOUND,
+      `Template not found for type: ${templateType}`,
+      { templateType, templatePath }
+    )
   }
 
   // 递归复制模板文件
