@@ -3,9 +3,12 @@ import { loadConfig } from '../../src/core/config.js'
 import { promises as fs } from 'fs'
 import path from 'path'
 
+const rootDir = path.join(process.cwd(), 'tests/root-temp')
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
+
 describe('loadConfig', () => {
-  it('should load default config', async () => {
-    const config = await loadConfig('non-existent-config.json')
+  it('should load default config when file not found', async () => {
+    const config = await loadConfig('non-existent-config.ts')
     
     expect(config.port).toBe(4000)
     expect(config.host).toBe('localhost')
@@ -13,19 +16,19 @@ describe('loadConfig', () => {
     expect(config.routes).toEqual([])
   })
 
-  it('should load custom config', async () => {
-    const testConfigPath = path.join(process.cwd(), 'test-config.json')
-    const testConfig = {
+  it('should load custom JS config', async () => {
+    const testConfigPath = path.join(rootDir, 'test-config.js')
+    const testConfig = `export default {
       port: 4000,
       host: '0.0.0.0',
       routes: [
         { path: '/test', method: 'GET', response: { status: 'ok' } }
       ]
-    }
+    }`
     
-    await fs.writeFile(testConfigPath, JSON.stringify(testConfig))
+    await fs.writeFile(testConfigPath, testConfig)
     
-    const config = await loadConfig('test-config.json')
+    const config = await loadConfig(testConfigPath)
     
     expect(config.port).toBe(4000)
     expect(config.host).toBe('0.0.0.0')
@@ -35,50 +38,50 @@ describe('loadConfig', () => {
   })
 
   it('should override config with CLI options', async () => {
-    const config = await loadConfig('non-existent.json', { port: 5000 })
+    const config = await loadConfig('non-existent.ts', { port: 5000 })
     
     expect(config.port).toBe(5000)
   })
 
   it('should validate route must have path', async () => {
-    const testConfigPath = path.join(process.cwd(), 'test-invalid-config.json')
-    const testConfig = {
-      routes: [{ method: 'GET' }]
-    }
+    const testConfigPath = path.join(rootDir, 'test-invalid-config.js')
+    const testConfig = `export default {
+      routes: [{ method: 'GET', response: {} }]
+    }`
     
-    await fs.writeFile(testConfigPath, JSON.stringify(testConfig))
+    await fs.writeFile(testConfigPath, testConfig)
     
     await expect(
-      loadConfig('test-invalid-config.json')
+      loadConfig(testConfigPath)
     ).rejects.toThrow(/missing required 'path' property/)
     
     await fs.unlink(testConfigPath)
   })
 
-  it('should validate route must have response or responseFile', async () => {
-    const testConfigPath = path.join(process.cwd(), 'test-no-response.json')
-    const testConfig = {
+  it('should validate route must have response', async () => {
+    const testConfigPath = path.join(rootDir, 'test-no-response.js')
+    const testConfig = `export default {
       routes: [{ path: '/test', method: 'GET' }]
-    }
+    }`
     
-    await fs.writeFile(testConfigPath, JSON.stringify(testConfig))
+    await fs.writeFile(testConfigPath, testConfig)
     
     await expect(
-      loadConfig('test-no-response.json')
-    ).rejects.toThrow(/must have either 'response' or 'responseFile'/)
+      loadConfig(testConfigPath)
+    ).rejects.toThrow(/must have either 'response'/)
     
     await fs.unlink(testConfigPath)
   })
 
   it('should default method to GET', async () => {
-    const testConfigPath = path.join(process.cwd(), 'test-default-method.json')
-    const testConfig = {
+    const testConfigPath = path.join(rootDir, 'test-default-method.js')
+    const testConfig = `export default {
       routes: [{ path: '/test', response: {} }]
-    }
+    }`
     
-    await fs.writeFile(testConfigPath, JSON.stringify(testConfig))
+    await fs.writeFile(testConfigPath, testConfig)
     
-    const config = await loadConfig('test-default-method.json')
+    const config = await loadConfig(testConfigPath)
     
     expect(config.routes[0]!.method).toBe('GET')
     
@@ -99,7 +102,6 @@ describe('loadConfig', () => {
   it('should load TS config file', async () => {
     const configPath = path.join(__dirname, '../fixtures/config/mock.config.ts')
     const config = await loadConfig(configPath)
-    
     expect(config.port).toBe(3002)
     expect(config.host).toBe('0.0.0.0')
     expect(config.baseUrl).toBe('/v2/api')
@@ -130,64 +132,26 @@ describe('loadConfig', () => {
     expect(config.routes[0]!.name).toBe('异步配置路由')
   })
 
-  it('should prioritize .js over .json config files', async () => {
-    const jsConfigPath = path.join(process.cwd(), 'test-priority.js')
-    const jsonConfigPath = path.join(process.cwd(), 'test-priority.json')
+  it('should prioritize .ts over .js config files', async () => {
+    const tsConfigPath = path.join(rootDir, 'test-priority.ts')
+    const jsConfigPath = path.join(rootDir, 'test-priority.js')
     
-    const jsConfig = {
-      port: 9999,
-      host: 'js-host',
-      routes: [{ path: '/js', method: 'GET', response: { from: 'js' } }]
-    }
-    
-    const jsonConfig = {
-      port: 8888,
-      host: 'json-host',
-      routes: [{ path: '/json', method: 'GET', response: { from: 'json' } }]
-    }
-    
-    await fs.writeFile(jsConfigPath, `export default ${JSON.stringify(jsConfig)}`)
-    await fs.writeFile(jsonConfigPath, JSON.stringify(jsonConfig))
-    
-    const config = await loadConfig('test-priority')
-    
-    expect(config.port).toBe(9999)
-    expect(config.host).toBe('js-host')
-    expect(config.routes[0]!.path).toBe('/js')
-    expect((config.routes[0]!.response as any).from).toBe('js')
-    
-    await fs.unlink(jsConfigPath)
-    await fs.unlink(jsonConfigPath)
-  })
-
-  it('should prioritize .ts over .js and .json config files', async () => {
-    const tsConfigPath = path.join(process.cwd(), 'test-priority-ts.ts')
-    const jsConfigPath = path.join(process.cwd(), 'test-priority-ts.js')
-    const jsonConfigPath = path.join(process.cwd(), 'test-priority-ts.json')
-    
-    const tsConfig = {
+    const tsConfig = `export default {
       port: 7777,
       host: 'ts-host',
       routes: [{ path: '/ts', method: 'GET', response: { from: 'ts' } }]
-    }
+    }`
     
-    const jsConfig = {
+    const jsConfig = `export default {
       port: 6666,
       host: 'js-host',
       routes: [{ path: '/js', method: 'GET', response: { from: 'js' } }]
-    }
+    }`
     
-    const jsonConfig = {
-      port: 5555,
-      host: 'json-host',
-      routes: [{ path: '/json', method: 'GET', response: { from: 'json' } }]
-    }
+    await fs.writeFile(tsConfigPath, tsConfig)
+    await fs.writeFile(jsConfigPath, jsConfig)
     
-    await fs.writeFile(tsConfigPath, `export default ${JSON.stringify(tsConfig)}`)
-    await fs.writeFile(jsConfigPath, `export default ${JSON.stringify(jsConfig)}`)
-    await fs.writeFile(jsonConfigPath, JSON.stringify(jsonConfig))
-    
-    const config = await loadConfig('test-priority-ts')
+    const config = await loadConfig(tsConfigPath)
     
     expect(config.port).toBe(7777)
     expect(config.host).toBe('ts-host')
@@ -196,11 +160,56 @@ describe('loadConfig', () => {
     
     await fs.unlink(tsConfigPath)
     await fs.unlink(jsConfigPath)
-    await fs.unlink(jsonConfigPath)
+  })
+
+  it('should support route.response as function', async () => {
+    const testConfigPath = path.join(rootDir, 'test-response-func.js')
+    const testConfig = `export default {
+      routes: [{
+        path: '/func',
+        method: 'GET',
+        response: () => ({ data: 'from function' })
+      }]
+    }`
+    
+    await fs.writeFile(testConfigPath, testConfig)
+    
+    const config = await loadConfig(testConfigPath)
+    
+    expect(config.routes[0]!.path).toBe('/func')
+    expect(typeof config.routes[0]!.response).toBe('function')
+    const result = (config.routes[0]!.response as Function)()
+    expect(result).toEqual({ data: 'from function' })
+    
+    await fs.unlink(testConfigPath)
+  })
+
+  it('should support route.response as async function', async () => {
+    const testConfigPath = path.join(rootDir, 'test-response-async.js')
+    const testConfig = `export default {
+      routes: [{
+        path: '/async',
+        method: 'GET',
+        response: async () => {
+          return { data: 'from async function' }
+        }
+      }]
+    }`
+    
+    await fs.writeFile(testConfigPath, testConfig)
+    
+    const config = await loadConfig(testConfigPath)
+    
+    expect(config.routes[0]!.path).toBe('/async')
+    expect(typeof config.routes[0]!.response).toBe('function')
+    const result = await (config.routes[0]!.response as Function)()
+    expect(result).toEqual({ data: 'from async function' })
+    
+    await fs.unlink(testConfigPath)
   })
 
   it('should handle invalid JS/TS config file', async () => {
-    const invalidConfigPath = path.join(process.cwd(), 'test-invalid.js')
+    const invalidConfigPath = path.join(rootDir, 'test-invalid.js')
     await fs.writeFile(invalidConfigPath, 'export default "invalid"')
     
     await expect(
@@ -211,7 +220,7 @@ describe('loadConfig', () => {
   })
 
   it('should handle JS function that returns non-object', async () => {
-    const invalidFuncPath = path.join(process.cwd(), 'test-invalid-func.js')
+    const invalidFuncPath = path.join(rootDir, 'test-invalid-func.js')
     await fs.writeFile(invalidFuncPath, 'export default () => "invalid"')
     
     await expect(
@@ -222,7 +231,7 @@ describe('loadConfig', () => {
   })
 
   it('should handle missing default export in JS/TS config', async () => {
-    const noDefaultPath = path.join(process.cwd(), 'test-no-default.js')
+    const noDefaultPath = path.join(rootDir, 'test-no-default.js')
     await fs.writeFile(noDefaultPath, 'export const other = {}')
     
     await expect(

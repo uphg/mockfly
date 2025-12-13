@@ -1,0 +1,1 @@
+export default {"port":6666,"host":"js-host","routes":[{"path":"/js","method":"GET","response":{"from":"js"}}]}

@@ -12,7 +12,7 @@ const config: MockflyConfig = {
       name: "获取用户列表 V2",
       path: "/users",
       method: "GET",
-      responseFile: "users-v2.json"
+      response: { users: [] }
     }
   ]
 }

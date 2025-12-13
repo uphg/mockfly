@@ -40,6 +40,3 @@ export const registerRoutes = async (fastify: FastifyInstance, config: MockflyCo
   }
 }
 
-export const clearRoutes = (fastify: FastifyInstance): void => {
-  fastify.close()
-}

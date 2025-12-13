@@ -1,6 +1,6 @@
 import path from 'path'
 import merge from 'lodash.merge'
-import { fileExists, readJsonFile } from './utils.ts'
+import { fileExists } from './utils.ts'
 import type { MockflyConfig, CliOptions, Route } from '../utility-types'
 
 const defaultConfig: MockflyConfig = {
@@ -13,14 +13,14 @@ const defaultConfig: MockflyConfig = {
   routes: []
 }
 
-export const defaultConfigPath = 'mockfly/mock.config.json'
-
 // 配置文件优先级顺序
-const configFileExtensions = ['.ts', '.js', '.json'] as const
+const configFileExtensions = ['.ts', '.js'] as const
 
 // 按优先级搜索配置文件
-const findConfigFile = async (basePath: string): Promise<string | null> => {
+const findConfigFile = async (basePath?: string): Promise<string | null> => {
+  if (!basePath) return null
   const cwd = process.cwd()
+  const mockDir = path.join(cwd, 'mockfly');
   const baseName = path.basename(basePath, path.extname(basePath))
   
   // 如果指定了具体路径，优先使用该路径
@@ -34,7 +34,7 @@ const findConfigFile = async (basePath: string): Promise<string | null> => {
 
   // 按优先级搜索默认配置文件名
   for (const ext of configFileExtensions) {
-    const configPath = path.resolve(cwd, `${baseName}${ext}`)
+    const configPath = path.resolve(mockDir, `${baseName}${ext}`)
     if (await fileExists(configPath)) {
       return configPath
     }
@@ -69,7 +69,7 @@ const loadJsConfig = async (filePath: string): Promise<Partial<MockflyConfig>> =
 }
 
 export const loadConfig = async (
-  configPath = defaultConfigPath,
+  configPath?: string,
   cliOptions: CliOptions = {}
 ): Promise<MockflyConfig> => {
   const cwd = process.cwd()
@@ -80,11 +80,7 @@ export const loadConfig = async (
   let fileConfig: Partial<MockflyConfig> = {}
   if (resolvedPath) {
     const ext = path.extname(resolvedPath).toLowerCase()
-    
-    if (ext === '.json') {
-      // JSON 配置文件
-      fileConfig = await readJsonFile(resolvedPath)
-    } else if (ext === '.js' || ext === '.ts') {
+    if (ext === '.js' || ext === '.ts') {
       // JS/TS 配置文件
       fileConfig = await loadJsConfig(resolvedPath)
     } else {
@@ -125,15 +121,8 @@ const validateConfig = (config: MockflyConfig): void => {
     if (!route.method) {
       route.method = 'GET'
     }
-    if (!route.response && !route.responseFile) {
-      throw new Error(`Route '${route.path}' must have either 'response' or 'responseFile' property`)
+    if (!route.response) {
+      throw new Error(`Route '${route.path}' must have either 'response' property`)
     }
   })
-}
-
-export const reloadConfig = async (
-  configPath: string,
-  cliOptions: CliOptions = {}
-): Promise<MockflyConfig> => {
-  return await loadConfig(configPath, cliOptions)
 }

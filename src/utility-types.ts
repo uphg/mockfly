@@ -4,10 +4,10 @@ export interface MockflyConfig {
   port: number
   host: string
   baseUrl: string
-  delay: number
-  cors: boolean
+  delay?: number
+  cors?: boolean
   staticDir?: string
-  mockDir: string
+  mockDir?: string
   routes: Route[]
   configPath?: string
   configDir?: string
@@ -17,9 +17,16 @@ export interface Route {
   name?: string
   path: string
   method: HttpMethod
-  response?: ResponseData
-  responseFile?: string
+  response?: ResponseData | FunResponse | AsyncFunResponse
   delay?: number
+}
+
+interface AsyncFunResponse {
+  async (req: TemplateContext): ResponseData
+}
+
+interface FunResponse {
+  (req: TemplateContext): ResponseData
 }
 
 export type ResponseData = string | number | boolean | null | ResponseObject | ResponseArray

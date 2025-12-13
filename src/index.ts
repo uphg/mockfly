@@ -1,6 +1,6 @@
-export { loadConfig, reloadConfig } from './core/config'
+export { loadConfig } from './core/config'
 export { createServer, startServer } from './core/server'
-export { registerRoutes, clearRoutes } from './core/routes'
+export { registerRoutes } from './core/routes'
 export { createRouteHandler, createHealthHandler } from './core/handlers'
 export { createTemplateContext, renderTemplate } from './core/templates'
 export * from './utility-types'

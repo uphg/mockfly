@@ -10,7 +10,7 @@ export default {
       name: "获取用户列表",
       path: "/users",
       method: "GET",
-      responseFile: "users.json"
+      response: { users: [] }
     }
   ]
 }
