@@ -40,12 +40,6 @@ export const startServer = async (config: MockflyConfig) => {
     logInfo(`MockFly server running at http://${config.host}:${config.port}`)
     logInfo(`Base URL: ${config.baseUrl}`)
     logInfo(`Health check: http://${config.host}:${config.port}/health`)
-    console.log('')
-    config.routes.forEach((route) => {
-      const fullPath = config.baseUrl + route.path
-      const routeName = route.name || route.path
-      return console.log(`Registered route: [${route.method}] ${fullPath} - ${routeName}`)
-    })
     return fastify
   } catch (err) {
     throw createError(

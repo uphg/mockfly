@@ -4,11 +4,12 @@ import type { MockflyConfig } from '../utility-types'
 
 export const registerRoutes = async (fastify: FastifyInstance, config: MockflyConfig): Promise<void> => {
   fastify.get('/health', createHealthHandler())
-  
+
   for (const route of config.routes) {
     const fullPath = config.baseUrl + route.path
+    const routeName = route.name || route.path
     const handler = createRouteHandler(route, config)
-    
+
     switch (route.method.toLowerCase()) {
       case 'get':
         fastify.get(fullPath, handler)
@@ -34,6 +35,8 @@ export const registerRoutes = async (fastify: FastifyInstance, config: MockflyCo
       default:
         console.warn(`Unknown HTTP method: ${route.method}`)
     }
+
+    console.log(`Registered route: [${route.method}] ${fullPath} - ${routeName}`)
   }
 }
 

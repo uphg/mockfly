@@ -66,7 +66,7 @@ export const handleError = (error: unknown): never => {
 }
 
 export const logWarning = (message: string, details?: Record<string, unknown>) => {
-  console.warn(`⚠️ ${message}`)
+  console.warn(`(!) ${message}`)
   if (details) {
     console.warn('   Details:', details)
   }
