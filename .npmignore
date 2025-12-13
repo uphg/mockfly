@@ -2,6 +2,7 @@ tests/
 examples/
 temp/
 demo-config/
+opencodetmp/
 *.log
 .DS_Store
 .env

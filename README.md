@@ -67,9 +67,6 @@ echo 'export default { port: 3001, routes: [] }' > mockfly/mock.config.js
 
 # TypeScript 格式
 echo 'export default { port: 3001, routes: [] }' > mockfly/mock.config.ts
-
-# JSON 格式
-echo '{}' > mockfly/mock.config.json
 ```
 
 **完整示例 (mock.config.js):**
@@ -134,7 +131,6 @@ MockFly 支持多种配置文件格式，按以下优先级自动检测：
 
 1. **mock.config.ts** (TypeScript - 最高优先级)
 2. **mock.config.js** (JavaScript)
-3. **mock.config.json** (JSON - 向后兼容)
 
 #### 1. JSON 配置 (传统格式)
 
@@ -350,7 +346,6 @@ GET /health
 
 1. `mock.config.ts` (TypeScript - 最高优先级)
 2. `mock.config.js` (JavaScript)
-3. `mock.config.json` (JSON - 向后兼容)
 
 可以在 CLI 命令中手动指定配置文件：
 ```bash
@@ -367,7 +362,7 @@ mockfly dev -c custom.config.ts
 mockfly init [options]
 
 Options:
-  -e, --ext <extension>  配置文件后缀 (.js, .ts, .json)
+  -e, --ext <extension>  配置文件后缀 (.js, .ts)
   -h, --help            显示帮助
 ```
 
@@ -384,7 +379,7 @@ Options:
 mockfly start [options]
 
 Options:
-  -c, --config <path>   配置文件路径 (默认: mockfly/mock.config.json, 支持 .ts/.js/.json)
+  -c, --config <path>   配置文件路径 (默认: mockfly/mock.config.ts/js)
   -p, --port <number>   端口号
   -h, --help           显示帮助
 ```
@@ -397,7 +392,7 @@ Options:
 mockfly dev [options]
 
 Options:
-  -c, --config <path>   配置文件路径 (默认: mockfly/mock.config.json, 支持 .ts/.js/.json)
+  -c, --config <path>   配置文件路径 (默认: mockfly/mock.config.ts/js)
   -p, --port <number>   端口号
   -h, --help           显示帮助
 ```
