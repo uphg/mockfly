@@ -5,7 +5,6 @@
 ## 特性
 
 - 基于 Fastify，高性能、低延迟
-- JSON 配置驱动，简单易用
 - 支持热重载，开发体验友好
 - 函数式响应，动态数据处理
 - CORS 跨域支持
@@ -135,19 +134,6 @@ MockFly 支持多种配置文件格式，按以下优先级自动检测：
 1. **mock.config.ts** (TypeScript - 最高优先级)
 2. **mock.config.js** (JavaScript)
 
-#### 1. JSON 配置 (传统格式)
-
-```json
-{
-  "port": 3001,
-  "host": "localhost",
-  "baseUrl": "/api",
-  "routes": [...]
-}
-```
-
-#### 2. JavaScript 配置
-
 **静态配置：**
 ```javascript
 // mock.config.js
@@ -203,7 +189,7 @@ export default async () => {
 - 支持异步数据获取
 - 便于配置复用和维护
 
-#### 3. TypeScript 配置
+#### TypeScript 配置
 
 ```typescript
 // mock.config.ts
@@ -284,8 +270,6 @@ export default () => {
   }
 }
 ```
-
-
 
 ## 静态文件服务
 
