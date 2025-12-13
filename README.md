@@ -7,11 +7,9 @@
 - 基于 Fastify，高性能、低延迟
 - JSON 配置驱动，简单易用
 - 支持热重载，开发体验友好
-- Handlebars 模板支持，动态响应
-- 支持多种响应类型（JSON/文件流）
+- 函数式响应，动态数据处理
 - CORS 跨域支持
 - 响应延迟模拟
-- 函数式编程，代码简洁
 - 静态文件服务支持
 - 内置健康检查端点
 - 自动项目初始化
@@ -44,7 +42,6 @@ mockfly init
 # 强制指定配置文件类型
 mockfly init --ext .ts    # TypeScript
 mockfly init --ext .js    # JavaScript  
-mockfly init --ext .json  # JSON
 ```
 
 `init` 命令会自动：
@@ -80,7 +77,13 @@ export default {
       "name": "获取用户列表",
       "path": "/users",
       "method": "GET",
-      "responseFile": "users.json"
+      "response": [
+        {
+          "id": "1",
+          "name": "张三",
+          "email": "zhangsan@example.com"
+        }
+      ]
     }
   ]
 }
@@ -239,7 +242,6 @@ export default (): MockflyConfig => {
   "path": "/users/:id",
   "method": "GET",
   "response": {},
-  "responseFile": "users.json",
   "delay": 1000
 }
 ```
@@ -248,8 +250,7 @@ export default (): MockflyConfig => {
 - `name`: 路由描述名称（可选）
 - `path`: 路由路径，支持路径参数（如 `/users/:id`）
 - `method`: HTTP 方法（GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD）
-- `response`: 直接返回的响应数据
-- `responseFile`: 响应数据文件路径（相对于 mockDir）
+- `response`: 直接返回的响应数据或函数
 - `delay`: 响应延迟时间（毫秒），覆盖全局延迟设置
 
 ### 环境变量和动态配置示例
@@ -284,27 +285,7 @@ export default () => {
 }
 ```
 
-## 模板变量
 
-支持 Handlebars 模板语法：
-
-```json
-{
-  "path": "/users/:id",
-  "method": "GET",
-  "response": {
-    "id": "{{params.id}}",
-    "name": "用户{{params.id}}",
-    "email": "user{{params.id}}@example.com"
-  }
-}
-```
-
-可用变量：
-- `{{params.xxx}}` - 路径参数
-- `{{query.xxx}}` - 查询参数
-- `{{body.xxx}}` - 请求体
-- `{{headers.xxx}}` - 请求头
 
 ## 静态文件服务
 
@@ -431,26 +412,49 @@ project/
 export default {
   port: 3001,
   routes: [
-    { path: "/users", method: "GET", responseFile: "users.json" },
-    { path: "/users/:id", method: "GET", response: { id: "{{params.id}}" } },
-    { path: "/users", method: "POST", response: { status: "created" } }
+    { 
+      path: "/users", 
+      method: "GET", 
+      response: [
+        { id: 1, name: "张三", email: "zhangsan@example.com" },
+        { id: 2, name: "李四", email: "lisi@example.com" }
+      ] 
+    },
+    { 
+      path: "/users/:id", 
+      method: "GET", 
+      response: (context) => ({ 
+        id: context.params.id,
+        name: `用户${context.params.id}`,
+        email: `user${context.params.id}@example.com`
+      }) 
+    },
+    { 
+      path: "/users", 
+      method: "POST", 
+      response: { status: "created" } 
+    }
   ]
 }
 ```
 
-**2. 复杂数据模拟：**
+**2. 函数式动态响应：**
 ```javascript
 export default {
   routes: [
     {
       path: "/products",
       method: "GET",
-      response: {
-        items: "{{#each (range 1 10)}}{\"id\":{{this}}\"name\":\"Product {{this}}\"}{{/each}}",
+      response: (context) => ({
+        items: Array.from({ length: 10 }, (_, i) => ({
+          id: i + 1,
+          name: `Product ${i + 1}`,
+          price: Math.floor(Math.random() * 100) + 10
+        })),
         total: 10,
-        page: "{{query.page}}",
-        perPage: "{{query.limit}}"
-      }
+        page: context.query.page || 1,
+        perPage: context.query.limit || 10
+      })
     }
   ]
 }
