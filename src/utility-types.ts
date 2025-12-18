@@ -21,8 +21,8 @@ export interface Route {
   delay?: number
 }
 
-type AsyncFunResponse = (req: TemplateContext) => Promise<ResponseData>
-type FunResponse = (req: TemplateContext) => ResponseData
+export type AsyncFunResponse = (req: TemplateContext) => Promise<ResponseData>
+export type FunResponse = (req: TemplateContext) => ResponseData
 
 export type ResponseData = string | number | boolean | null | ResponseObject | ResponseArray
 
