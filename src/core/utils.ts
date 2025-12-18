@@ -1,8 +1,8 @@
-import { promises as fs } from 'fs'
+import { promises } from 'node:fs'
 
 export const fileExists = async (filePath: string): Promise<boolean> => {
   try {
-    await fs.access(filePath)
+    await promises.access(filePath)
     return true
   } catch {
     return false

@@ -59,7 +59,7 @@ describe('routes', () => {
       await registerRoutes(mockFastify, config)
 
       expect(mockFastify.get).toHaveBeenCalledWith('/api/users', expect.any(Function))
-      expect(consoleLogSpy).toHaveBeenCalledWith('Registered route: [GET] /api/users - /users')
+      expect(consoleLogSpy).toHaveBeenCalledWith('[Registered route] [GET] /api/users - /users')
     })
 
     it('should register POST route', async () => {
@@ -78,7 +78,7 @@ describe('routes', () => {
       await registerRoutes(mockFastify, config)
 
       expect(mockFastify.post).toHaveBeenCalledWith('/api/users', expect.any(Function))
-      expect(consoleLogSpy).toHaveBeenCalledWith('Registered route: [POST] /api/users - 创建用户')
+      expect(consoleLogSpy).toHaveBeenCalledWith('[Registered route] [POST] /api/users - 创建用户')
     })
 
     it('should register PUT route', async () => {
@@ -210,7 +210,7 @@ describe('routes', () => {
 
       await registerRoutes(mockFastify, config)
 
-      expect(consoleLogSpy).toHaveBeenCalledWith('Registered route: [GET] /api/users - 获取用户列表')
+      expect(consoleLogSpy).toHaveBeenCalledWith('[Registered route] [GET] /api/users - 获取用户列表')
     })
 
     it('should use path as name when route name not provided', async () => {
@@ -227,7 +227,7 @@ describe('routes', () => {
 
       await registerRoutes(mockFastify, config)
 
-      expect(consoleLogSpy).toHaveBeenCalledWith('Registered route: [GET] /api/users - /users')
+      expect(consoleLogSpy).toHaveBeenCalledWith('[Registered route] [GET] /api/users - /users')
     })
 
     it('should warn for unknown HTTP method', async () => {

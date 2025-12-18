@@ -2,7 +2,7 @@ import { delay } from './utils.ts'
 import type { Route, MockflyConfig, TemplateContext } from '../utility-types'
 import type { FastifyRequest, FastifyReply } from 'fastify'
 
-export const createRouteHandler = (route: Route, config: MockflyConfig) => {
+export function createRouteHandler(route: Route, config: MockflyConfig) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
     if (route.delay || config.delay) {
       await delay(route.delay || config.delay)
@@ -27,7 +27,7 @@ export const createRouteHandler = (route: Route, config: MockflyConfig) => {
   }
 }
 
-export const createHealthHandler = () => {
+export function createHealthHandler() {
   return async (_request: FastifyRequest, reply: FastifyReply) => {
     return reply.send({ 
       status: 'ok',

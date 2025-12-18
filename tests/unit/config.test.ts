@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { loadConfig } from '../../src/core/config.js'
-import { promises as fs } from 'fs'
-import path from 'path'
+import { promises as fs } from 'node:fs'
+import path from 'node:path'
 
 const rootDir = path.join(process.cwd(), 'tests/root-temp')
 const __dirname = path.dirname(new URL(import.meta.url).pathname)

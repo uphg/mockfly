@@ -1,8 +1,8 @@
-import { createRouteHandler, createHealthHandler } from './handlers.ts'
 import type { FastifyInstance } from 'fastify'
 import type { MockflyConfig } from '../utility-types'
+import { createRouteHandler, createHealthHandler } from './handlers.ts'
 
-export const registerRoutes = async (fastify: FastifyInstance, config: MockflyConfig): Promise<void> => {
+export async function registerRoutes(fastify: FastifyInstance, config: MockflyConfig): Promise<void> {
   fastify.get('/health', createHealthHandler())
 
   for (const route of config.routes) {
@@ -36,7 +36,7 @@ export const registerRoutes = async (fastify: FastifyInstance, config: MockflyCo
         console.warn(`Unknown HTTP method: ${route.method}`)
     }
 
-    console.log(`Registered route: [${route.method}] ${fullPath} - ${routeName}`)
+    console.log(`[Registered route] [${route.method}] ${fullPath} - ${routeName}`)
   }
 }
 

@@ -89,7 +89,6 @@
   - `parsePort()` - 解析端口号并验证有效性
   - `createCliOptions()` - 创建 CLI 选项对象
   - `isValidPort()` - 验证端口号是否有效
-  - `getDefaultPort()` - 获取默认端口号
 - **重构的文件**：
   - `src/cli/dev.ts` - 使用工具函数替换重复代码
   - `src/cli/start.ts` - 使用工具函数替换重复代码

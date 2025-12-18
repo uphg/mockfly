@@ -38,11 +38,3 @@ export const createCliOptions = (options: CliOptions): Partial<CliOptions> => {
 export const isValidPort = (port: number): boolean => {
   return Number.isInteger(port) && port >= 1 && port <= 65535
 }
-
-/**
- * 获取默认端口号
- * @returns 默认端口号
- */
-export const getDefaultPort = (): number => {
-  return 3000
-}

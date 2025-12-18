@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import merge from 'lodash.merge'
 import { fileExists } from './utils.ts'
 import { createError, ErrorCodes, logWarning } from './errors.ts'
@@ -80,10 +80,7 @@ const loadJsConfig = async (filePath: string): Promise<Partial<MockflyConfig>> =
   }
 }
 
-export const loadConfig = async (
-  configPath?: string,
-  cliOptions: CliOptions = {}
-): Promise<MockflyConfig> => {
+export async function loadConfig (configPath?: string, cliOptions: CliOptions = {}): Promise<MockflyConfig> {
   const cwd = process.cwd()
   
   // 搜索配置文件

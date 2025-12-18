@@ -1,5 +1,5 @@
-import fs from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs/promises'
+import path from 'node:path'
 // import { fileURLToPath } from 'url'
 import { fileExists } from '../core/utils'
 import { createError, ErrorCodes, handleError } from '../core/errors'

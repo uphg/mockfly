@@ -1,5 +1,5 @@
 import chokidar from 'chokidar'
-import path from 'path'
+import path from 'node:path'
 import { loadConfig } from '../core/config'
 import { startServer } from '../core/server'
 import { handleError, logInfo } from '../core/errors'
