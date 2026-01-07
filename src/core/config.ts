@@ -5,7 +5,7 @@ import { createError, ErrorCodes, logWarning } from './errors.ts'
 import type { MockflyConfig, CliOptions, Route } from '../utility-types'
 
 const defaultConfig: MockflyConfig = {
-  port: 4000,
+  port: 3000,
   host: 'localhost',
   baseUrl: '/api',
   delay: 0,

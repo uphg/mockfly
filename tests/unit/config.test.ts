@@ -10,7 +10,7 @@ describe('loadConfig', () => {
   it('should load default config when file not found', async () => {
     const config = await loadConfig('non-existent-config.ts')
     
-    expect(config.port).toBe(4000)
+    expect(config.port).toBe(3000)
     expect(config.host).toBe('localhost')
     expect(config.baseUrl).toBe('/api')
     expect(config.routes).toEqual([])
